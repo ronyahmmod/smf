@@ -1,0 +1,150 @@
+import React, { useEffect, useState } from "react";
+import { db } from "../../firebase/firebase-config";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import Layout from "../../components/Layout";
+import Spinner from "react-bootstrap/Spinner";
+
+const AdminApprovePage = () => {
+  const [requests, setRequest] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 5;
+
+  const fetchRequests = async () => {
+    setLoading(true);
+    try {
+      const snapshot = await getDocs(collection(db, "pendingStudents"));
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setRequest(data.reverse());
+    } catch (error) {
+      alert("Error occured: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const handleApprove = async (student) => {
+    try {
+      await addDoc(collection(db, "students"), {
+        name: student.name,
+        email: student.email,
+        phone: student.phone,
+        roll: student.roll,
+        class: student.class,
+        uid: student.uid,
+        createdAt: new Date(),
+      });
+      await deleteDoc(doc(db, "pendingStudents", student.id));
+      alert(`Approved ${student.name}`);
+      fetchRequests();
+    } catch (error) {
+      alert("Failed to approve: " + error.message);
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      await deleteDoc(doc(db, "pendingStudents", id));
+      alert("Application Rejected");
+      fetchRequests();
+    } catch (error) {
+      alert("Error occured: " + error.message);
+    }
+  };
+
+  const totalPages = Math.ceil(requests.length / PAGE_SIZE);
+  const currentRequests = requests.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  return (
+    <Layout role="admin">
+      <div className="container mt-4">
+        <h4>Pending Student Applications</h4>
+
+        {loading ? (
+          <div className="text-center mt-5">
+            <Spinner animation="border" variant="primary" />
+            <p>Loading students...</p>
+          </div>
+        ) : currentRequests.length === 0 ? (
+          <p className="text-center mt-4">No pending requests.</p>
+        ) : (
+          <div className="table-responsive mt-3">
+            <table className="table table-bordered align-middle">
+              <thead className="table-light">
+                <tr>
+                  <th>Name</th>
+                  <th>Class</th>
+                  <th>Roll</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentRequests.map((s) => (
+                  <tr key={s.id}>
+                    <td>{s.name}</td>
+                    <td>{s.class}</td>
+                    <td>{s.roll}</td>
+                    <td>{s.email}</td>
+                    <td>{s.phone}</td>
+                    <td>
+                      <button
+                        onClick={() => handleApprove(s)}
+                        className="btn btn-success btn-sm me-2"
+                      >
+                        <i className="fas fa-check-circle me-1"></i> Approve
+                      </button>
+                      <button
+                        onClick={() => handleReject(s.id)}
+                        className="btn btn-danger btn-sm"
+                      >
+                        <i className="fas fa-times-circle me-1"></i> Reject
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Pagination */}
+            <div className="text-center mt-3">
+              <button
+                className="btn btn-outline-secondary me-2"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                Prev
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                className="btn btn-outline-secondary ms-2"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </Layout>
+  );
+};
+
+export default AdminApprovePage;

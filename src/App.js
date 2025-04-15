@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -10,6 +10,8 @@ import Result from "./pages/student/Result";
 import Payment from "./pages/student/Payment";
 import ProtectedRoute from "./Routes/ProtectedRoute";
 import SignupPage from "./pages/SignupPage";
+import StudentApplyPage from "./pages/student/StudentApplyPage";
+import AdminApprovePage from "./pages/admin/AdminApprovePage";
 
 function App() {
   return (
@@ -20,7 +22,7 @@ function App() {
         <Route
           path="/admin-dashboard"
           element={
-            <ProtectedRoute allowedRole="admin">
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminDashboard />
             </ProtectedRoute>
           }
@@ -28,7 +30,7 @@ function App() {
         <Route
           path="/admin-dashboard/students"
           element={
-            <ProtectedRoute allowedRole="admin">
+            <ProtectedRoute allowedRoles={["admin"]}>
               <ManageStudents />
             </ProtectedRoute>
           }
@@ -36,8 +38,16 @@ function App() {
         <Route
           path="/admin-dashboard/analysis"
           element={
-            <ProtectedRoute allowedRole="admin">
+            <ProtectedRoute allowedRoles={["admin"]}>
               <Analysis />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/approve-students"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminApprovePage />
             </ProtectedRoute>
           }
         />
@@ -46,7 +56,7 @@ function App() {
         <Route
           path="/student-dashboard"
           element={
-            <ProtectedRoute allowedRole="student">
+            <ProtectedRoute allowedRoles={["student"]}>
               <StudentDashboard />
             </ProtectedRoute>
           }
@@ -54,7 +64,7 @@ function App() {
         <Route
           path="/student-dashboard/attendance"
           element={
-            <ProtectedRoute allowedRole="student">
+            <ProtectedRoute allowedRoles={["student"]}>
               <Attendance />
             </ProtectedRoute>
           }
@@ -62,7 +72,7 @@ function App() {
         <Route
           path="/student-dashboard/result"
           element={
-            <ProtectedRoute allowedRole="student">
+            <ProtectedRoute allowedRoles={["student"]}>
               <Result />
             </ProtectedRoute>
           }
@@ -70,8 +80,16 @@ function App() {
         <Route
           path="/student-dashboard/payment"
           element={
-            <ProtectedRoute allowedRole="student">
+            <ProtectedRoute allowedRoles={["student"]}>
               <Payment />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student-dashboard/apply"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentApplyPage />
             </ProtectedRoute>
           }
         />

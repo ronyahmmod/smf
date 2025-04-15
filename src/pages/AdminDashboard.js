@@ -21,7 +21,6 @@ const AdminDashboard = () => {
               </div>
             </Link>
           </div>
-
           <div className="col-md-4">
             <Link
               to="/admin-dashboard/analysis"
@@ -31,6 +30,19 @@ const AdminDashboard = () => {
                 <div className="card-body text-center">
                   <i className="fas fa-chart-line fa-3x mb-3 text-success"></i>
                   <h5>Analytics</h5>
+                </div>
+              </div>
+            </Link>
+          </div>
+          <div className="col-md-4">
+            <Link
+              to="/admin-dashboard/approve-students"
+              className="text-decoration-none"
+            >
+              <div className="card bg-light shadow-sm h-100">
+                <div className="card-body text-center">
+                  <i className="fa-solid fa-circle-check fa-3x mb-3 text-primary"></i>
+                  <h5>Approve Students</h5>
                 </div>
               </div>
             </Link>

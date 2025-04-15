@@ -49,6 +49,19 @@ const StudentDashboard = () => {
               </div>
             </Link>
           </div>
+          <div className="col-md-4">
+            <Link
+              to="/student-dashboard/apply"
+              className="text-decoration-none"
+            >
+              <div className="card bg-light shadow-sm h-100">
+                <div className="card-body text-center">
+                  <i className="fa-solid fa-file fa-3x mb-3 text-success"></i>
+                  <h5>Register</h5>
+                </div>
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
     </Layout>

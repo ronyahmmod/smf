@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/firebase-config";
+import { auth, db } from "../firebase/firebase-config";
 import { useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
 
 /*
 IN FUTURE USE- We store data to firestore
@@ -25,10 +26,14 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      const role = localStorage.getItem("userRole");
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      const uid = userCred.user.uid;
+      const userDoc = await getDoc(doc(db, "users", uid));
+      const role = userDoc.data()?.role;
+      // const role = localStorage.getItem("userRole"); [Now it is not required, Role is managed by firebase]
       if (role === "admin") navigate("/admin-dashboard");
-      else navigate("/student-dashboard");
+      else if (role === "student") navigate("/student-dashboard");
+      else alert("Invalid role.");
     } catch (error) {
       alert(error.message);
     }
