@@ -1,55 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const ClassFormModal = ({ onClose, onSubmit, editinData }) => {
-  const [className, setClassName] = useState(editinData?.name || "");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (className.trim() === "") {
-      return;
+const ClassFormModal = ({ show, onClose, onSubmit, initialData }) => {
+  const [form, setForm] = useState({ name: "", description: "" });
+  useEffect(() => {
+    if (initialData) {
+      setForm(initialData);
+    } else {
+      setForm({ name: "", description: "" });
     }
-    onSubmit(className, editinData?.id || null);
+  }, [initialData]);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  if (!show) return null;
+
   return (
-    <div
-      className="modal show d-block"
-      tabIndex="-1"
-      style={{ background: "#00000088" }}
-    >
+    <div className="modal d-block bg-dark bg-opacity-50">
       <div className="modal-dialog">
         <div className="modal-content">
-          <form onSubmit={handleSubmit}>
-            <div className="modal-header">
-              <h5 className="modal-title">
-                {editinData ? "Edit Class" : "Add New Class"}
-              </h5>
-              <button
-                type="button"
-                className="btn btn-close"
-                onClick={onClose}
-              ></button>
-            </div>
-            <div className="modal-body">
-              <input
-                type="text"
-                value={className}
-                onChange={(e) => {
-                  setClassName(e.target.value);
-                }}
-                className="form-control"
-                placeholder="Enter your class name"
-              />
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={onClose}>
-                Cancel
-              </button>
-              <button type="submit" className="btn btn-primary">
-                {editinData ? "Update" : "Add"}
-              </button>
-            </div>
-          </form>
+          <div className="modal-header">
+            <h5 className="modal-title">
+              {initialData ? "Edit Class" : "Add New Class"}
+            </h5>
+            <button
+              type="button"
+              className="btn btn-close"
+              onClick={onClose}
+            ></button>
+          </div>
+          <div className="modal-body">
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              className="form-control mb-2"
+              placeholder="Enter your class name"
+            />
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={form.description}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+          <div className="modal-footer">
+            <button className="btn btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary">
+              {initialData ? "Update" : "Add"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

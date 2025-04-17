@@ -13,6 +13,7 @@ import SignupPage from "./pages/SignupPage";
 import StudentApplyPage from "./pages/student/StudentApplyPage";
 import AdminApprovePage from "./pages/admin/AdminApprovePage";
 import ClassManagementPage from "./pages/admin/ClassManagementPage";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 
 function App() {
   return (
@@ -20,6 +21,16 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        {/* SUPER ADMIN ROUTES */}
+        <Route
+          path="/superadmin-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["superadmin"]}>
+              <SuperAdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        {/* END SUPER ADMIN */}
         <Route
           path="/admin-dashboard"
           element={

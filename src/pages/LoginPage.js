@@ -30,9 +30,11 @@ const LoginPage = () => {
       const uid = userCred.user.uid;
       const userDoc = await getDoc(doc(db, "users", uid));
       const role = userDoc.data()?.role;
+      console.log(userDoc.data());
       // const role = localStorage.getItem("userRole"); [Now it is not required, Role is managed by firebase]
       if (role === "admin") navigate("/admin-dashboard");
       else if (role === "student") navigate("/student-dashboard");
+      else if (role === "superadmin") navigate("/superadmin-dashboard");
       else alert("Invalid role.");
     } catch (error) {
       alert(error.message);

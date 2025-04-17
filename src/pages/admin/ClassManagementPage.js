@@ -1,28 +1,24 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
-import { db } from "../../firebase/firebase-config";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  Timestamp,
-} from "firebase/firestore";
 import ClassFormModal from "../../components/ClassFormModal";
 import { useAuth } from "../../context/AuthContext";
+import {
+  getClasses,
+  addClass,
+  updateClass,
+  deleteClass,
+} from "../../services/classService";
 
 const ClassManagementPage = () => {
   const [classes, setClasses] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedClass, setSelectedClass] = useState(null);
+  const [editData, setEditData] = useState(null);
   const { user } = useAuth();
 
-  const SUPER_ADMIN_ID = "your_super_admin_id_here"; // REPLACE WITH REAL ID LATTER
+  const isSuperAdmin = user?.role === "superadmin";
 
   const fetchClasses = async () => {
-    const snapshot = await getDocs(collection(db, "classes"));
-    const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const data = await getClasses();
     setClasses(data);
   };
 
@@ -30,27 +26,29 @@ const ClassManagementPage = () => {
     fetchClasses();
   }, []);
 
-  const handleAddOrUpdate = async (className, editingId = null) => {
-    if (editingId) {
-      // Update latter if needed
-    } else {
-      await addDoc(collection(db, "classes"), {
-        name: className,
-        createdAt: Timestamp.now(),
-        createdBy: user.id,
-      });
-    }
-    fetchClasses();
-    setShowModal(false);
+  const handleEdit = (data) => {
+    setEditData(data);
+    setShowModal(true);
   };
+
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure?")) {
-      await deleteDoc(doc(db, "classes", id));
+      await deleteClass(id);
       fetchClasses();
     }
   };
 
-  if (user.uid !== SUPER_ADMIN_ID) {
+  const handleSubmit = async (form) => {
+    if (editData) {
+      await updateClass(editData.id, form);
+    } else {
+      await addClass(form);
+    }
+    setShowModal(true);
+    fetchClasses();
+  };
+
+  if (!isSuperAdmin) {
     return (
       <Layout role={["admin"]}>
         <div className="container mt-5">
@@ -63,30 +61,50 @@ const ClassManagementPage = () => {
   return (
     <Layout role={["admin"]}>
       <div className="container mt-4">
-        <h4 className="mb-4">Class Management</h4>
-        <button
-          className="btn btn-primary mb-3"
-          onClick={() => setShowModal(true)}
-        >
-          Add New Class
-        </button>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h4 className="mb-4">Class Management</h4>
+          <button
+            className="btn btn-primary mb-3"
+            onClick={() => setShowModal(true)}
+          >
+            Add New Class
+          </button>
+        </div>
       </div>
-      <table className="table table-bordered">
-        {classes.map((cls, index) => {
-          return (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{cls.name}</td>
-              {/* Edit feature in future */}
-              <button
-                className="btn btn-danger btn-sm"
-                onClick={() => handleDelete(cls.id)}
-              >
-                Delete
-              </button>
-            </tr>
-          );
-        })}
+      <table className="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Class Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {classes.map((cls, index) => {
+            return (
+              <tr key={cls.id}>
+                <td>{cls.name}</td>
+                <td>{cls.description}</td>
+                {/* Edit feature in future */}
+                <td>
+                  <button
+                    className="btn btn-sm btn-info me-2"
+                    onClick={() => handleEdit(cls)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleDelete(cls.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+
         {classes.length === 0 && (
           <tr>
             <td colSpan="3" className="text-center text-muted">
@@ -97,8 +115,10 @@ const ClassManagementPage = () => {
       </table>
       {showModal && (
         <ClassFormModal
+          show={showModal}
           onClose={() => setShowModal(false)}
-          onSubmit={handleAddOrUpdate}
+          onSubmit={handleSubmit}
+          initialData={editData}
         />
       )}
     </Layout>
