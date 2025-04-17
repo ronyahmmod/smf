@@ -14,6 +14,7 @@ import StudentApplyPage from "./pages/student/StudentApplyPage";
 import AdminApprovePage from "./pages/admin/AdminApprovePage";
 import ClassManagementPage from "./pages/admin/ClassManagementPage";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import UnAuthorizePage from "./pages/UnAuthorizePage";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/unauthorized" element={<UnAuthorizePage />} />
         {/* SUPER ADMIN ROUTES */}
         <Route
           path="/superadmin-dashboard"
