@@ -3,7 +3,7 @@ import Layout from "../../components/Layout";
 
 const Result = () => {
   return (
-    <Layout role="student">
+    <Layout role={["student"]}>
       <h4>Results</h4>
       <p>Your results will be shown here.</p>
     </Layout>

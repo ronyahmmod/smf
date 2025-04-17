@@ -19,7 +19,7 @@ const SignupPage = () => {
         password
       );
       const uid = userCred.user.uid;
-      //   localStorage.setItem("userRole", role); [First we use but now it is maintained by firestore]
+      // localStorage.setItem("userRole", role); [First we use but now it is maintained by firestore]
       // Store user data to firestore
       await setDoc(doc(db, "users", uid), {
         email,

@@ -6,15 +6,26 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  updateDoc,
 } from "firebase/firestore";
 import Layout from "../../components/Layout";
 import Spinner from "react-bootstrap/Spinner";
+import AssignStudentModal from "../../components/AssignStudentModal";
 
 const AdminApprovePage = () => {
   const [requests, setRequest] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [rejectionInputs, setRejectionInputs] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+
   const PAGE_SIZE = 5;
+
+  const handleApproveClick = (student) => {
+    setSelectedStudent(student);
+    setShowModal(true);
+  };
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -33,29 +44,37 @@ const AdminApprovePage = () => {
     fetchRequests();
   }, []);
 
-  const handleApprove = async (student) => {
+  const handleFinalApprove = async ({ roll, subjects }) => {
     try {
       await addDoc(collection(db, "students"), {
-        name: student.name,
-        email: student.email,
-        phone: student.phone,
-        roll: student.roll,
-        class: student.class,
-        uid: student.uid,
+        ...selectedStudent,
+        roll,
+        subjects,
+        status: "approved",
         createdAt: new Date(),
+        approvedBy: "admin@example.com", // {later set real admin UID or email}
       });
-      await deleteDoc(doc(db, "pendingStudents", student.id));
-      alert(`Approved ${student.name}`);
+      await deleteDoc(doc(db, "pendingStudents", selectedStudent.id));
+      alert(`Approved ${selectedStudent.name}`);
+      setShowModal(false);
       fetchRequests();
     } catch (error) {
       alert("Failed to approve: " + error.message);
     }
   };
 
-  const handleReject = async (id) => {
+  const handleReject = async (student) => {
+    const reason = rejectionInputs[student.id];
+    if (!reason || reason.trim() === "") {
+      alert("Please provide a reason for rejection.");
+      return;
+    }
     try {
-      await deleteDoc(doc(db, "pendingStudents", id));
-      alert("Application Rejected");
+      await updateDoc(doc(db, "pendingStudents", student.id), {
+        status: "rejected",
+        rejectionReason: reason,
+      });
+      alert(`Rejected ${student.name}`);
       fetchRequests();
     } catch (error) {
       alert("Error occured: " + error.message);
@@ -69,7 +88,7 @@ const AdminApprovePage = () => {
   );
 
   return (
-    <Layout role="admin">
+    <Layout role={["admin"]}>
       <div className="container mt-4">
         <h4>Pending Student Applications</h4>
 
@@ -90,6 +109,7 @@ const AdminApprovePage = () => {
                   <th>Roll</th>
                   <th>Email</th>
                   <th>Phone</th>
+                  <th>Rejection Comment (optional):</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -102,14 +122,28 @@ const AdminApprovePage = () => {
                     <td>{s.email}</td>
                     <td>{s.phone}</td>
                     <td>
+                      <textarea
+                        className="form-control mt-1"
+                        rows="2"
+                        placeholder="Enter reason for rejection"
+                        value={rejectionInputs[s.id] || ""}
+                        onChange={(e) =>
+                          setRejectionInputs({
+                            ...rejectionInputs,
+                            [s.id]: e.target.value,
+                          })
+                        }
+                      ></textarea>
+                    </td>
+                    <td>
                       <button
-                        onClick={() => handleApprove(s)}
+                        onClick={() => handleApproveClick(s)}
                         className="btn btn-success btn-sm me-2"
                       >
                         <i className="fas fa-check-circle me-1"></i> Approve
                       </button>
                       <button
-                        onClick={() => handleReject(s.id)}
+                        onClick={() => handleReject(s)}
                         className="btn btn-danger btn-sm"
                       >
                         <i className="fas fa-times-circle me-1"></i> Reject
@@ -143,6 +177,13 @@ const AdminApprovePage = () => {
           </div>
         )}
       </div>
+      {/* Approve Modal */}
+      <AssignStudentModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onSubmit={handleFinalApprove}
+        student={selectedStudent}
+      />
     </Layout>
   );
 };

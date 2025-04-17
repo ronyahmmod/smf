@@ -1,5 +1,5 @@
 import React from "react";
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -12,6 +12,7 @@ import ProtectedRoute from "./Routes/ProtectedRoute";
 import SignupPage from "./pages/SignupPage";
 import StudentApplyPage from "./pages/student/StudentApplyPage";
 import AdminApprovePage from "./pages/admin/AdminApprovePage";
+import ClassManagementPage from "./pages/admin/ClassManagementPage";
 
 function App() {
   return (
@@ -48,6 +49,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminApprovePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin-dashboard/manage-classes"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <ClassManagementPage />
             </ProtectedRoute>
           }
         />

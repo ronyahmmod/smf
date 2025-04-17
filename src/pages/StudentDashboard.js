@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const StudentDashboard = () => {
   return (
-    <Layout role="student">
+    <Layout role={["student"]}>
       <div className="container mt-4">
         <h3 className="mb-4">Student Dashboard</h3>
         <div className="row g-4">

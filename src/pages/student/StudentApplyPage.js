@@ -1,80 +1,140 @@
-import React, { useState } from "react";
-import { db, auth } from "../../firebase/firebase-config";
-import { addDoc, collection } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
+import { db } from "../../firebase/firebase-config";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import Layout from "../../components/Layout";
+import { useAuth } from "../../context/AuthContext";
 
 const StudentApplyPage = () => {
+  const { user } = useAuth();
+  const uid = user?.uid;
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
-    roll: "",
     class: "",
+    email: "",
   });
+
+  const [status, setStatus] = useState("draft");
+  const [rejectionReason, setRejectionReason] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  //   Fetch existing application
+  useEffect(() => {
+    const fetchApplication = async () => {
+      setLoading(true);
+      if (!uid) {
+        return;
+      }
+      const docRef = doc(db, "pendingStudents", uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setForm(data);
+        setStatus(data.status || "draft");
+        setRejectionReason(data.rejectionReason || "");
+        if (["submitted", "proccessing"].includes(data.status)) {
+          setIsLocked(true);
+        }
+      }
+      setLoading(false);
+    };
+    fetchApplication();
+  }, [uid]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const user = auth.currentUser;
+  const handleSubmit = async () => {
+    if (!uid) alert("Not logged in");
     try {
-      await addDoc(collection(db, "pendingStudents"), {
+      await setDoc(doc(db, "pendingStudents", uid), {
         ...form,
-        email: user.email,
-        uid: user.uid,
-        status: "pending",
+        uid,
+        status: "submitted",
+        rejectionReason: "",
         createdAt: new Date(),
       });
-      alert("Application submitted!");
-      setForm({ name: "", phone: "", roll: "", class: "" });
+      alert("Application submitted successfully!");
+      setIsLocked(true);
+      setStatus("submitted");
     } catch (error) {
       alert("Failed to apply: ", error.message);
     }
   };
 
+  if (loading) return <p>Loading</p>;
+
   return (
-    <div className="container mt-4">
-      <h4>Apply for Registration</h4>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          onChange={handleChange}
-          value={form.name}
-          placeholder="Full Name"
-          className="form-control mb-3"
-          required
-        />
-        <input
-          name="phone"
-          type="tel"
-          onChange={handleChange}
-          value={form.phone}
-          placeholder="Phone"
-          className="form-control mb-3"
-          required
-        />
-        <input
-          name="roll"
-          type="text"
-          onChange={handleChange}
-          value={form.roll}
-          placeholder="Roll Number"
-          className="form-control mb-3"
-          required
-        />
-        <input
-          type="text"
-          name="class"
-          onChange={handleChange}
-          value={form.class}
-          placeholder="Class"
-          className="form-control mb-3"
-          required
-        />
-        <button className="btn btn-primary">Submit Application</button>
-      </form>
-    </div>
+    <Layout role={["student"]}>
+      <div className="container mt-4">
+        <h4>Student Application Form</h4>
+        {status === "rejected" && (
+          <div className="alert alert-danger">
+            <strong>Rejected:</strong> {rejectionReason}
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
+          <div className="row mb-3">
+            <div className="col-md-6">
+              <label>Name</label>
+              <input
+                className="form-control"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                disabled={isLocked}
+              />
+            </div>
+            <div className="col-md-6">
+              <label>Email</label>
+              <input
+                className="form-control"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                disabled={isLocked}
+              />
+            </div>
+          </div>
+          <div className="row mb-3">
+            <div className="col-md-6">
+              <label>Phone</label>
+              <input
+                className="form-control"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                disabled={isLocked}
+              />
+            </div>
+            <div className="col-md-6">
+              <label>Class</label>
+              <input
+                className="form-control"
+                name="class"
+                value={form.class}
+                onChange={handleChange}
+                disabled={isLocked}
+              />
+            </div>
+          </div>
+
+          <button
+            className="btn btn-primary"
+            onClick={handleSubmit}
+            disabled={isLocked}
+          >
+            Submit Application
+          </button>
+        </form>
+        {/* <div className="alert alert-warning mt-3">
+          {status === "submitted" && "Application is under proccessing."}
+        </div> */}
+      </div>
+    </Layout>
   );
 };
 
