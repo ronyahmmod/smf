@@ -8,6 +8,7 @@ import {
   updateClass,
   deleteClass,
 } from "../../services/classService";
+import Loader from "../../components/Loader";
 
 const ClassManagementPage = () => {
   const [classes, setClasses] = useState([]);
@@ -84,9 +85,7 @@ const ClassManagementPage = () => {
           </tr>
         </thead>
         {loading ? (
-          <div className="text-center my-4">
-            <div className="spinner-border text-primary" role="status"></div>
-          </div>
+          <Loader />
         ) : (
           <tbody>
             {classes.map((cls, index) => {

@@ -9,8 +9,8 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import Layout from "../../components/Layout";
-import Spinner from "react-bootstrap/Spinner";
 import AssignStudentModal from "../../components/AssignStudentModal";
+import Loader from "../../components/Loader";
 
 const AdminApprovePage = () => {
   const [requests, setRequest] = useState([]);
@@ -93,10 +93,7 @@ const AdminApprovePage = () => {
         <h4>Pending Student Applications</h4>
 
         {loading ? (
-          <div className="text-center mt-5">
-            <Spinner animation="border" variant="primary" />
-            <p>Loading students...</p>
-          </div>
+          <Loader />
         ) : currentRequests.length === 0 ? (
           <p className="text-center mt-4">No pending requests.</p>
         ) : (
