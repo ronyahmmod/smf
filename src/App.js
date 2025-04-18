@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -32,11 +32,19 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/superadmin-dashboard/manage-classes"
+          element={
+            <ProtectedRoute allowedRoles={["superadmin"]}>
+              <ClassManagementPage />
+            </ProtectedRoute>
+          }
+        />
         {/* END SUPER ADMIN */}
         <Route
           path="/admin-dashboard"
           element={
-            <ProtectedRoute allowedRoles={["admin"]}>
+            <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
               <AdminDashboard />
             </ProtectedRoute>
           }
@@ -44,7 +52,7 @@ function App() {
         <Route
           path="/admin-dashboard/students"
           element={
-            <ProtectedRoute allowedRoles={["admin"]}>
+            <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
               <ManageStudents />
             </ProtectedRoute>
           }
@@ -52,7 +60,7 @@ function App() {
         <Route
           path="/admin-dashboard/analysis"
           element={
-            <ProtectedRoute allowedRoles={["admin"]}>
+            <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
               <Analysis />
             </ProtectedRoute>
           }
@@ -60,17 +68,8 @@ function App() {
         <Route
           path="/admin-dashboard/approve-students"
           element={
-            <ProtectedRoute allowedRoles={["admin"]}>
+            <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
               <AdminApprovePage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin-dashboard/manage-classes"
-          element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <ClassManagementPage />
             </ProtectedRoute>
           }
         />

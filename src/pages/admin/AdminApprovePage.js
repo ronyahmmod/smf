@@ -88,7 +88,7 @@ const AdminApprovePage = () => {
   );
 
   return (
-    <Layout role={["admin"]}>
+    <Layout role={["admin", "superadmin"]}>
       <div className="container mt-4">
         <h4>Pending Student Applications</h4>
 

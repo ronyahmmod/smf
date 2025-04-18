@@ -23,8 +23,9 @@ const Sidebar = ({ role }) => {
       style={{ width: "220px" }}
     >
       <h5 className="text-center mb-4">Dashboard</h5>
+
       <ul className="nav flex-column">
-        {role.includes("admin") && (
+        {(role.includes("admin") || role.includes("superadmin")) && (
           <>
             <li className="nav-item mb-2">
               <NavLink
@@ -60,6 +61,17 @@ const Sidebar = ({ role }) => {
               </NavLink>
             </li>
           </>
+        )}
+
+        {role.includes("superadmin") && (
+          <li className="navitem mb-2">
+            <NavLink
+              to="/superadmin-dashboard/manage-classes"
+              className="nav-link text-white"
+            >
+              <FaUserCheck className="me-2" /> Manage Classes
+            </NavLink>
+          </li>
         )}
 
         {role.includes("student") && (

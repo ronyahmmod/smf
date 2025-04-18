@@ -14,6 +14,10 @@ const ClassFormModal = ({ show, onClose, onSubmit, initialData }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleSubmit = () => {
+    onSubmit(form);
+  };
+
   if (!show) return null;
 
   return (
@@ -51,7 +55,11 @@ const ClassFormModal = ({ show, onClose, onSubmit, initialData }) => {
             <button className="btn btn-secondary" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              onClick={handleSubmit}
+            >
               {initialData ? "Update" : "Add"}
             </button>
           </div>

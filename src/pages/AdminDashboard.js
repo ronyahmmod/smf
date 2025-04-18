@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   return (
-    <Layout role={["admin"]}>
+    <Layout role={["admin", "superadmin"]}>
       <div className="container mt-4">
         <h3 className="mb-4">Admin Dashboard</h3>
         <div className="row g-4">

@@ -3,7 +3,7 @@ import Layout from "../../components/Layout";
 
 const ManageStudents = () => {
   return (
-    <Layout role={["admin"]}>
+    <Layout role={["admin", "superadmin"]}>
       <h4>ManageStudents</h4>
       <p>This is the student management page.</p>
     </Layout>
