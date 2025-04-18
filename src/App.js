@@ -15,6 +15,7 @@ import AdminApprovePage from "./pages/admin/AdminApprovePage";
 import ClassManagementPage from "./pages/admin/ClassManagementPage";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import UnAuthorizePage from "./pages/UnAuthorizePage";
+import SubjectManagementPage from "./pages/admin/SubjectManagementPage";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/unauthorized" element={<UnAuthorizePage />} />
+
         {/* SUPER ADMIN ROUTES */}
         <Route
           path="/superadmin-dashboard"
@@ -40,6 +42,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/superadmin-dashboard/manage-subjects"
+          element={
+            <ProtectedRoute allowedRoles={["superadmin"]}>
+              <SubjectManagementPage />
+            </ProtectedRoute>
+          }
+        />
         {/* END SUPER ADMIN */}
         <Route
           path="/admin-dashboard"
@@ -49,6 +59,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/admin-dashboard/students"
           element={

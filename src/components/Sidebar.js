@@ -20,7 +20,7 @@ const Sidebar = ({ role }) => {
   return (
     <div
       className="bg-dark text-white p-3 vh-100 position-fixed"
-      style={{ width: "220px" }}
+      style={{ width: "240px" }}
     >
       <h5 className="text-center mb-4">Dashboard</h5>
 
@@ -64,14 +64,25 @@ const Sidebar = ({ role }) => {
         )}
 
         {role.includes("superadmin") && (
-          <li className="navitem mb-2">
-            <NavLink
-              to="/superadmin-dashboard/manage-classes"
-              className="nav-link text-white"
-            >
-              <FaUserCheck className="me-2" /> Manage Classes
-            </NavLink>
-          </li>
+          <>
+            <li className="navitem mb-2">
+              <NavLink
+                to="/superadmin-dashboard/manage-classes"
+                className="nav-link text-white"
+              >
+                <FaUserCheck className="me-2" /> Manage Classes
+              </NavLink>
+            </li>
+            <li className="navitem mb-2">
+              <NavLink
+                to="/superadmin-dashboard/manage-subjects"
+                className="nav-link text-white"
+              >
+                <i className="fa-regular fa-file-zipper me-2"></i> Manage
+                Subjects
+              </NavLink>
+            </li>
+          </>
         )}
 
         {role.includes("student") && (

@@ -8,22 +8,24 @@ import {
   updateClass,
   deleteClass,
 } from "../../services/classService";
-import Loader from "../../components/Loader";
+
+import { useLoader } from "../../context/LoaderContext";
 
 const ClassManagementPage = () => {
   const [classes, setClasses] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editData, setEditData] = useState(null);
-  const [loading, setLoading] = useState(false);
+
+  const { showLoader, hideLoader } = useLoader();
   const { role } = useAuth();
 
   const isSuperAdmin = role === "superadmin";
 
   const fetchClasses = async () => {
-    setLoading(true);
+    showLoader();
     const data = await getClasses();
     setClasses(data);
-    setLoading(false);
+    hideLoader();
   };
 
   useEffect(() => {
@@ -84,42 +86,39 @@ const ClassManagementPage = () => {
             <th>Actions</th>
           </tr>
         </thead>
-        {loading ? (
-          <Loader />
-        ) : (
-          <tbody>
-            {classes.map((cls, index) => {
-              return (
-                <tr key={cls.id}>
-                  <td>{cls.name}</td>
-                  <td>{cls.description}</td>
-                  {/* Edit feature in future */}
-                  <td>
-                    <button
-                      className="btn btn-sm btn-info me-2"
-                      onClick={() => handleEdit(cls)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleDelete(cls.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-            {classes.length === 0 && (
-              <tr>
-                <td colSpan="3" className="text-center text-muted">
-                  No classes available.
+
+        <tbody>
+          {classes.map((cls, index) => {
+            return (
+              <tr key={cls.id}>
+                <td>{cls.name}</td>
+                <td>{cls.description}</td>
+                {/* Edit feature in future */}
+                <td>
+                  <button
+                    className="btn btn-sm btn-info me-2"
+                    onClick={() => handleEdit(cls)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleDelete(cls.id)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
-            )}
-          </tbody>
-        )}
+            );
+          })}
+          {classes.length === 0 && (
+            <tr>
+              <td colSpan="3" className="text-center text-muted">
+                No classes available.
+              </td>
+            </tr>
+          )}
+        </tbody>
       </table>
       {showModal && (
         <ClassFormModal
