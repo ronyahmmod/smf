@@ -16,6 +16,7 @@ import ClassManagementPage from "./pages/admin/ClassManagementPage";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import UnAuthorizePage from "./pages/UnAuthorizePage";
 import SubjectManagementPage from "./pages/admin/SubjectManagementPage";
+import FeeManagementPage from "./pages/admin/FeeManagementPage";
 
 function App() {
   return (
@@ -31,6 +32,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["superadmin"]}>
               <SuperAdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        {/* Manage Fee */}
+        <Route
+          path="/superadmin-dashboard/manage-fees"
+          element={
+            <ProtectedRoute allowedRoles={["superadmin"]}>
+              <FeeManagementPage />
             </ProtectedRoute>
           }
         />

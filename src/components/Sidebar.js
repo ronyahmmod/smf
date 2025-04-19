@@ -82,6 +82,14 @@ const Sidebar = ({ role }) => {
                 Subjects
               </NavLink>
             </li>
+            <li className="navitem mb-2">
+              <NavLink
+                to="/superadmin-dashboard/manage-fees"
+                className="nav-link text-white"
+              >
+                <i className="fa-solid fa-money-bill-1 me-2"></i> Manage Fees
+              </NavLink>
+            </li>
           </>
         )}
 
