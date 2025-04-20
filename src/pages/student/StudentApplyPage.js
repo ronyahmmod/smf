@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../firebase/firebase-config";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import Layout from "../../components/Layout";
 import { useAuth } from "../../context/AuthContext";
+import { useLoader } from "../../context/LoaderContext";
 
 const StudentApplyPage = () => {
   const { user } = useAuth();
   const uid = user?.uid;
+  const { showLoader, hideLoader } = useLoader();
 
   const [form, setForm] = useState({
     name: "",
@@ -18,27 +20,40 @@ const StudentApplyPage = () => {
   const [status, setStatus] = useState("draft");
   const [rejectionReason, setRejectionReason] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [classList, setClassList] = useState([]);
 
   //   Fetch existing application
   useEffect(() => {
     const fetchApplication = async () => {
-      setLoading(true);
-      if (!uid) {
-        return;
-      }
-      const docRef = doc(db, "pendingStudents", uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setForm(data);
-        setStatus(data.status || "draft");
-        setRejectionReason(data.rejectionReason || "");
-        if (["submitted", "proccessing"].includes(data.status)) {
-          setIsLocked(true);
+      showLoader();
+      try {
+        if (!uid) {
+          return;
         }
+        // Fetching classes
+        const classSnap = await getDocs(collection(db, "classes"));
+        const classOptions = classSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setClassList(classOptions);
+
+        const docRef = doc(db, "pendingStudents", uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setForm(data);
+          setStatus(data.status || "draft");
+          setRejectionReason(data.rejectionReason || "");
+          if (["submitted", "proccessing"].includes(data.status)) {
+            setIsLocked(true);
+          }
+        }
+      } catch (error) {
+        alert("Data fetching error: " + error.message);
       }
-      setLoading(false);
+
+      hideLoader();
     };
     fetchApplication();
   }, [uid]);
@@ -47,7 +62,8 @@ const StudentApplyPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!uid) alert("Not logged in");
     try {
       await setDoc(doc(db, "pendingStudents", uid), {
@@ -64,8 +80,6 @@ const StudentApplyPage = () => {
       alert("Failed to apply: ", error.message);
     }
   };
-
-  if (loading) return <p>Loading</p>;
 
   return (
     <Layout role={["student"]}>
@@ -112,21 +126,24 @@ const StudentApplyPage = () => {
             </div>
             <div className="col-md-6">
               <label>Class</label>
-              <input
-                className="form-control"
+              <select
+                className="form-select"
                 name="class"
                 value={form.class}
                 onChange={handleChange}
                 disabled={isLocked}
-              />
+              >
+                <option value="">Select a class</option>
+                {classList.map((cls) => (
+                  <option key={cls.id} value={cls.name}>
+                    {cls.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <button
-            className="btn btn-primary"
-            onClick={handleSubmit}
-            disabled={isLocked}
-          >
+          <button className="btn btn-primary" disabled={isLocked}>
             Submit Application
           </button>
         </form>

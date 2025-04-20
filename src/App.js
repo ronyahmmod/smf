@@ -17,6 +17,7 @@ import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import UnAuthorizePage from "./pages/UnAuthorizePage";
 import SubjectManagementPage from "./pages/admin/SubjectManagementPage";
 import FeeManagementPage from "./pages/admin/FeeManagementPage";
+import AssignFeesPage from "./pages/admin/AssignFeesPage";
 
 function App() {
   return (
@@ -91,6 +92,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
               <AdminApprovePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin-dashboard/assign-fees"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+              <AssignFeesPage />
             </ProtectedRoute>
           }
         />
