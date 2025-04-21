@@ -53,14 +53,16 @@ const SubjectManagementPage = () => {
         await updateDoc(docRef, {
           name: subject.name,
           code: subject.code,
+          papers: subject.papers,
           updateAt: serverTimestamp(),
-          updateBy: user.email,
+          updateBy: user?.uid || "",
         });
       } else {
         await addDoc(collection(db, "subjects"), {
           name: subject.name,
           code: subject.code,
-          createdBy: user.email, // You can dynamically pass uid
+          papers: subject.papers,
+          createdBy: user?.uid || "", // You can dynamically pass uid
           createdAt: serverTimestamp(),
         });
       }
@@ -107,6 +109,7 @@ const SubjectManagementPage = () => {
             <th>#</th>
             <th>Subject Name</th>
             <th>Code</th>
+            <th>Papers</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -124,6 +127,10 @@ const SubjectManagementPage = () => {
                 <td>{idx + 1}</td>
                 <td>{sub.name}</td>
                 <td>{sub.code}</td>
+                {/* Papers if found */}
+                <td>
+                  {sub.papers?.map((p) => p.name + "-" + p?.code).join(", ")}
+                </td>
                 {/* Actions code */}
                 <td>
                   <button

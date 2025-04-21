@@ -8,6 +8,7 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
+  const [name, setName] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
@@ -25,6 +26,7 @@ const SignupPage = () => {
         uid,
         email,
         role,
+        name,
         createdAt: new Date(),
       });
       alert("Signup successfull!");
@@ -38,6 +40,14 @@ const SignupPage = () => {
     <div className="container mt-5">
       <h2>Signup</h2>
       <form onSubmit={handleSignup}>
+        <input
+          className="form-control mb-3"
+          type="text"
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
         <input
           className="form-control mb-3"
           type="email"

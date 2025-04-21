@@ -18,33 +18,16 @@ const AssignFeesPage = () => {
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectedFees, setSelectedFees] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
-  const [assignmentHistory, setAssignmentHistory] = useState([]);
 
   const { user } = useAuth();
   const { showLoader, hideLoader } = useLoader();
 
   useEffect(() => {
-    const fetchAssignmentHistory = async () => {
-      showLoader();
-      try {
-        const assignedFeeSnapshot = await getDocs(
-          collection(db, "studentFees")
-        );
-        const history = assignedFeeSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setAssignmentHistory(history);
-      } catch (error) {
-        alert("Data fetching error: " + error.message);
-      }
-      hideLoader();
-    };
     const fetchData = async () => {
       showLoader();
       try {
         const studentSnapshot = await getDocs(collection(db, "students"));
-        const feeSnapshot = await getDocs(collection(db, "feeStructures"));
+        const feeSnapshot = await getDocs(collection(db, "feeCategories"));
         setStudents(
           studentSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         );
@@ -56,7 +39,6 @@ const AssignFeesPage = () => {
     };
 
     fetchData();
-    fetchAssignmentHistory();
   }, []);
 
   const handleSelectedStudent = (id) => {
@@ -70,34 +52,49 @@ const AssignFeesPage = () => {
       alert("Please select a student and at least one fee");
       return;
     }
-    showLoader();
-    for (const studentId of selectedStudents) {
-      const assignedFees = selectedFees.map((feeId) => {
-        const fee = fees.find((f) => f.id === feeId);
-        return {
-          feeId,
-          feeName: fee.name,
-          amount: fee.amount,
-          status: "unpaid",
-          assignedBy: user.uid,
-          assignedAt: Timestamp.now(),
-        };
-      });
 
-      await setDoc(
-        doc(db, "studentFees", studentId),
-        {
-          studentId,
-          assignedFees,
-        },
-        { merge: true }
-      );
-      hideLoader();
+    showLoader();
+    try {
+      for (const studentId of selectedStudents) {
+        const studentRef = doc(db, "studentFees", studentId);
+        const existingDoc = await studentRef.get();
+        const existingFees = existingDoc.exists()
+          ? existingDoc.data().assignedFees || []
+          : [];
+
+        const newFees = selectedFees.map((feeId) => {
+          const fee = fees.find((f) => f.id === feeId);
+          return {
+            feeId,
+            feeName: fee.name,
+            amount: fee.amount,
+            status: "unpaid",
+            assignedBy: user.uid,
+            assignedAt: Timestamp.now(),
+          };
+        });
+
+        await setDoc(
+          studentRef,
+          {
+            studentId,
+            assignedFees: [...existingFees, ...newFees],
+          },
+          { merge: true }
+        );
+      }
+
       alert("Fees assigned successfully.");
       setSelectedFees([]);
       setSelectedStudents([]);
+    } catch (err) {
+      console.error(err);
+      alert("Assignment failed: " + err.message);
+    } finally {
+      hideLoader();
     }
   };
+
   const classes = [...new Set(students.map((student) => student.class))];
   const filteredStudents = selectedClass
     ? students.filter((s) => s.class === selectedClass)
