@@ -145,6 +145,14 @@ const Sidebar = ({ role }) => {
                 <FaUserCheck className="me-2" /> Apply
               </NavLink>
             </li>
+            <li className="nav-item mb-2">
+              <NavLink
+                to="/student-dashboard/fees"
+                className="nav-link text-white"
+              >
+                <FaUserCheck className="me-2" /> Fess
+              </NavLink>
+            </li>
           </>
         )}
         <li className="nav-item mb-2">

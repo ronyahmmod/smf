@@ -50,7 +50,6 @@ const FeeCategoryManagement = () => {
         updatedBy: user.uid,
       });
     } else {
-      console.log(category);
       await addDoc(collection(db, "feeCategories"), {
         ...category,
         createdAt: serverTimestamp(),
@@ -93,7 +92,7 @@ const FeeCategoryManagement = () => {
           <thead className="table-light">
             <tr>
               <th>#</th>
-              <th>Title</th>
+              <th>Name</th>
               <th>Amount</th>
               <th>Type</th>
               <th>Actions</th>
@@ -110,7 +109,7 @@ const FeeCategoryManagement = () => {
               categories.map((cat, idx) => (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
-                  <td>{cat.title}</td>
+                  <td>{cat.name}</td>
                   <td>{cat.amount} (BDT)</td>
                   <td>{cat.type?.toUpperCase()}</td>
                   <td>

@@ -18,6 +18,7 @@ import UnAuthorizePage from "./pages/UnAuthorizePage";
 import SubjectManagementPage from "./pages/admin/SubjectManagementPage";
 import AssignFeesPage from "./pages/admin/AssignFeesPage";
 import FeeCategoryManagement from "./pages/admin/FeeCategoryManagement";
+import MyFeesPage from "./pages/student/MyFeesPage";
 
 function App() {
   return (
@@ -143,6 +144,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["student"]}>
               <StudentApplyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student-dashboard/fees"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <MyFeesPage />
             </ProtectedRoute>
           }
         />

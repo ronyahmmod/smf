@@ -9,6 +9,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,6 +19,7 @@ export const AuthProvider = ({ children }) => {
         const docRef = doc(db, "users", currentUser.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
+          setUserData(docSnap.data());
           setRole(docSnap.data().role);
         }
       } else {
@@ -28,7 +30,7 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
   return (
-    <AuthContext.Provider value={{ user, role, loading }}>
+    <AuthContext.Provider value={{ user, role, loading, userData }}>
       {children}
     </AuthContext.Provider>
   );

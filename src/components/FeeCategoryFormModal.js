@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 const FeeCategoryFormModal = ({ category, onClose, onSave }) => {
-  const [title, setTitle] = useState("");
+  const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("annual"); // By default it set annual fee
 
   useEffect(() => {
     if (category) {
-      setTitle(category.title || "");
+      setName(category.name || "");
       setAmount(category.amount || "");
       setType(category.type || "");
     }
@@ -15,13 +15,13 @@ const FeeCategoryFormModal = ({ category, onClose, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title.trim() || !amount || isNaN(amount)) {
+    if (!name.trim() || !amount || isNaN(amount)) {
       alert("Please enter a valid title and numeric amount.");
       return;
     }
 
     const payLoad = {
-      title: title.trim(),
+      name: name.trim(),
       amount: parseFloat(amount),
       type,
     };
@@ -54,8 +54,8 @@ const FeeCategoryFormModal = ({ category, onClose, onSave }) => {
                   type="text"
                   className="form-control"
                   placeholder="e.g., Library Fee"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div className="mb-3">

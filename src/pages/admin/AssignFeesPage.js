@@ -5,6 +5,7 @@ import {
   doc,
   setDoc,
   Timestamp,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase/firebase-config";
 import Layout from "../../components/Layout";
@@ -57,7 +58,7 @@ const AssignFeesPage = () => {
     try {
       for (const studentId of selectedStudents) {
         const studentRef = doc(db, "studentFees", studentId);
-        const existingDoc = await studentRef.get();
+        const existingDoc = await getDoc(studentRef);
         const existingFees = existingDoc.exists()
           ? existingDoc.data().assignedFees || []
           : [];
